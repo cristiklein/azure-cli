@@ -2015,6 +2015,16 @@ def aks_list(cmd, client, resource_group_name=None):
         managed_clusters = client.list()
     return _remove_nulls(list(managed_clusters))
 
+def aks_delete(cmd, client, resource_group_name, name):
+    mc = client.get(resource_group_name, name)
+    client_id = mc.service_principal_profile.client_id
+    logger.warning(
+        f"The cluster used a service principal {client_id}. Please manually check this service principal "
+        f"and delete it if it is no longer required, as shown below:\n"
+        f"    az ad sp show --id {client_id}\n"
+        f"    az ad sp delete --id {client_id}\n"
+    )
+    return client.delete(resource_group_name, name)
 
 def aks_show(cmd, client, resource_group_name, name):
     mc = client.get(resource_group_name, name)
